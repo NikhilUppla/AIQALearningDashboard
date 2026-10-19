@@ -36,6 +36,7 @@
     }
     header h1 { margin: 0; font-size: 1.75rem; }
     header p { margin: 0.5rem 0 0; opacity: 0.9; }
+    header .timeline { margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.85; }
 
     .container {
       max-width: 1100px;
@@ -45,7 +46,7 @@
 
     .summary {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 1rem;
       margin-bottom: 1.5rem;
     }
@@ -61,6 +62,7 @@
     .summary-card.inprogress { border-top-color: var(--inprogress); }
     .summary-card.notstarted { border-top-color: var(--notstarted); }
     .summary-card.total { border-top-color: var(--accent); }
+    .summary-card.hours { border-top-color: #8b5cf6; }
     .summary-card .number {
       font-size: 2rem;
       font-weight: 700;
@@ -123,9 +125,19 @@
       align-items: center;
       margin-bottom: 1rem;
       cursor: pointer;
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
     .phase-header h2 { margin: 0; font-size: 1.25rem; }
     .phase-header .meta { font-size: 0.85rem; color: var(--muted); }
+    .phase-header .hours-badge {
+      background: #f3e8ff;
+      color: #7c3aed;
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
 
     .items {
       display: flex;
@@ -166,7 +178,15 @@
     .status-btn.active { outline: 2px solid var(--accent); outline-offset: 1px; }
 
     .content { flex: 1; }
-    .content h3 { margin: 0 0 0.35rem; font-size: 1rem; }
+    .content h3 { margin: 0 0 0.35rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .content h3 .time-est {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 0.15rem 0.4rem;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
     .content p { margin: 0 0 0.5rem; color: var(--muted); font-size: 0.9rem; }
     .resources {
       display: flex;
@@ -217,8 +237,9 @@
 </head>
 <body>
   <header>
-    <h1>AI QA / LLM Testing Learning Roadmap</h1>
-    <p>From QA automation fundamentals to AI agents, MLOps, and certifications</p>
+    <h1>AI QA Learning Dashboard</h1>
+    <p>From QA Automation to AI/LLM Testing Specialist</p>
+    <div class="timeline">Realistic Plan: ~5-6 months at 6-10 hrs/week (~156 total hours)</div>
   </header>
 
   <div class="container">
@@ -226,7 +247,8 @@
       <div class="summary-card completed"><div class="number" id="count-completed">0</div><div class="label">Completed</div></div>
       <div class="summary-card inprogress"><div class="number" id="count-inprogress">0</div><div class="label">In Progress</div></div>
       <div class="summary-card notstarted"><div class="number" id="count-notstarted">0</div><div class="label">Not Started</div></div>
-      <div class="summary-card total"><div class="number" id="count-total">0</div><div class="label">Total</div></div>
+      <div class="summary-card total"><div class="number" id="count-total">0</div><div class="label">Total Items</div></div>
+      <div class="summary-card hours"><div class="number" id="hours-completed">0</div><div class="label">Hours Done</div></div>
     </div>
 
     <div class="controls">
@@ -247,188 +269,138 @@
   </div>
 
   <footer>
-    Progress is saved automatically in your browser. Deploy free on GitHub Pages, Netlify, or Vercel.
+    Progress saves automatically in your browser. Plan: 6-10 hrs/week for ~5-6 months.
   </footer>
 
   <script>
     const roadmap = [
       {
-        phase: "Phase 1: Foundations (Weeks 1-6)",
+        phase: "Phase 1: Foundations (Weeks 1-10)",
+        totalHours: 45,
         items: [
-          { id: "p1-1", title: "Machine Learning fundamentals", desc: "Supervised/unsupervised learning, training vs inference, overfitting, model lifecycle.", resources: [
-            { name: "Fast.ai Practical Deep Learning", url: "https://course.fast.ai/" },
-            { name: "Coursera ML Specialization", url: "https://www.coursera.org/specializations/machine-learning-introduction" }
+          { id: "p1-1", title: "ML Concepts (No Coding)", desc: "Understand supervised/unsupervised learning, training vs inference, model basics — without building models.", hours: 7, resources: [
+            { name: "Google ML Crash Course", url: "https://developers.google.com/machine-learning/crash-course" }
           ], status: "notstarted" },
-          { id: "p1-2", title: "Deep learning & NLP basics", desc: "Embeddings, transformers, tokenization, attention mechanism.", resources: [
-            { name: "DeepLearning.AI NLP Specialization", url: "https://www.coursera.org/specializations/natural-language-processing" },
-            { name: "Stanford CS224N (YouTube)", url: "https://www.youtube.com/playlist?list=PLoROMvodv4rOSH4v6133s9LFPRHjEmbmJ" }
+          { id: "p1-2", title: "How LLMs Work", desc: "Transformers, tokens, embeddings, context windows, pre-training vs fine-tuning.", hours: 5, resources: [
+            { name: "Andrej Karpathy: Intro to LLMs (1hr)", url: "https://www.youtube.com/watch?v=zjkBMFhNj_g" },
+            { name: "State of GPT (1hr)", url: "https://www.youtube.com/watch?v=bZQun8Y4L2A" }
           ], status: "notstarted" },
-          { id: "p1-3", title: "LLM fundamentals", desc: "Pre-training, fine-tuning, RLHF, prompt engineering, context windows.", resources: [
-            { name: "Prompt Engineering for Developers", url: "https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/" },
-            { name: "OpenAI Documentation", url: "https://platform.openai.com/docs" },
-            { name: "Anthropic Documentation", url: "https://docs.anthropic.com/" }
+          { id: "p1-3", title: "Prompt Engineering", desc: "Techniques for effective prompts, few-shot, chain-of-thought, system prompts.", hours: 5, resources: [
+            { name: "DeepLearning.AI Prompt Engineering (free)", url: "https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/" }
           ], status: "notstarted" },
-          { id: "p1-4", title: "RAG systems overview", desc: "Retrieval, chunking, vector DBs, relevance, grounding.", resources: [
-            { name: "Pinecone Learning Center", url: "https://www.pinecone.io/learn/" },
-            { name: "Weaviate Documentation", url: "https://weaviate.io/developers/weaviate" },
-            { name: "LlamaIndex Tutorials", url: "https://docs.llamaindex.ai/en/stable/" }
+          { id: "p1-4", title: "RAG Fundamentals", desc: "Retrieval-augmented generation, chunking, embeddings, vector databases.", hours: 7, resources: [
+            { name: "LlamaIndex RAG Concepts", url: "https://docs.llamaindex.ai/en/stable/getting_started/concepts/" },
+            { name: "Pinecone: What is RAG?", url: "https://www.pinecone.io/learn/retrieval-augmented-generation/" }
           ], status: "notstarted" },
-          { id: "p1-5", title: "Certification: ML Specialization", desc: "Coursera DeepLearning.AI Machine Learning Specialization.", resources: [
-            { name: "Coursera ML Specialization", url: "https://www.coursera.org/specializations/machine-learning-introduction" }
+          { id: "p1-5", title: "Hands-On: Build a RAG Chatbot", desc: "Build a simple RAG app with LangChain or LlamaIndex to understand the full pipeline.", hours: 10, resources: [
+            { name: "LangChain RAG Tutorial", url: "https://python.langchain.com/docs/tutorials/rag/" },
+            { name: "LlamaIndex Starter Tutorial", url: "https://docs.llamaindex.ai/en/stable/getting_started/starter_example/" }
+          ], status: "notstarted" },
+          { id: "p1-6", title: "Python for AI (if needed)", desc: "Brush up on Python basics, pip, virtual environments, Jupyter notebooks.", hours: 6, resources: [
+            { name: "Python Official Tutorial", url: "https://docs.python.org/3/tutorial/" },
+            { name: "Real Python Basics", url: "https://realpython.com/learning-paths/python-basics/" }
+          ], status: "notstarted" },
+          { id: "p1-7", title: "OpenAI/Anthropic API Basics", desc: "Make API calls, understand tokens, pricing, rate limits.", hours: 5, resources: [
+            { name: "OpenAI API Quickstart", url: "https://platform.openai.com/docs/quickstart" },
+            { name: "Anthropic API Docs", url: "https://docs.anthropic.com/en/api/getting-started" }
           ], status: "notstarted" }
         ]
       },
       {
-        phase: "Phase 2: LLM Testing Fundamentals (Weeks 7-12)",
+        phase: "Phase 2: LLM Testing Core (Weeks 11-20)",
+        totalHours: 45,
         items: [
-          { id: "p2-1", title: "LLM evaluation metrics", desc: "Perplexity, BLEU, ROUGE, BERTScore, faithfulness, relevance, answer correctness.", resources: [
-            { name: "Ragas Documentation", url: "https://docs.ragas.io/" },
-            { name: "DeepEval Documentation", url: "https://docs.confident-ai.com/" }
+          { id: "p2-1", title: "LLM Evaluation Concepts", desc: "Metrics: faithfulness, relevance, answer correctness, context precision/recall.", hours: 6, resources: [
+            { name: "Ragas Metrics Docs", url: "https://docs.ragas.io/en/stable/concepts/metrics/index.html" },
+            { name: "DeepEval Metrics", url: "https://docs.confident-ai.com/docs/metrics-introduction" }
           ], status: "notstarted" },
-          { id: "p2-2", title: "Hallucination detection", desc: "Groundedness, factual consistency, citation verification.", resources: [
-            { name: "TruLens Documentation", url: "https://www.trulens.org/trulens_eval/getting_started/" },
-            { name: "LangSmith Documentation", url: "https://docs.smith.langchain.com/" }
+          { id: "p2-2", title: "Promptfoo: Prompt Testing", desc: "Version prompts, run test suites, compare outputs across models.", hours: 8, resources: [
+            { name: "Promptfoo Getting Started", url: "https://www.promptfoo.dev/docs/getting-started" },
+            { name: "Promptfoo GitHub", url: "https://github.com/promptfoo/promptfoo" }
           ], status: "notstarted" },
-          { id: "p2-3", title: "Prompt testing", desc: "Variation testing, adversarial prompts, jailbreak/red-team testing.", resources: [
-            { name: "Promptfoo", url: "https://www.promptfoo.dev/" },
-            { name: "OpenAI Evals GitHub", url: "https://github.com/openai/evals" }
+          { id: "p2-3", title: "Hallucination Detection", desc: "Groundedness, factual consistency, citation verification techniques.", hours: 6, resources: [
+            { name: "TruLens Groundedness", url: "https://www.trulens.org/trulens_eval/getting_started/" },
+            { name: "Ragas Faithfulness", url: "https://docs.ragas.io/en/stable/concepts/metrics/faithfulness.html" }
           ], status: "notstarted" },
-          { id: "p2-4", title: "RAG evaluation", desc: "Retrieval accuracy, context relevance, answer groundedness, latency.", resources: [
-            { name: "Ragas RAG Evaluation", url: "https://docs.ragas.io/en/stable/concepts/metrics/index.html" },
-            { name: "TruLens RAG Triad", url: "https://www.trulens.org/" }
+          { id: "p2-4", title: "RAG Evaluation with Ragas", desc: "Evaluate your RAG chatbot: retrieval quality, answer accuracy, groundedness.", hours: 8, resources: [
+            { name: "Ragas RAG Evaluation Tutorial", url: "https://docs.ragas.io/en/stable/getstarted/index.html" }
           ], status: "notstarted" },
-          { id: "p2-5", title: "Bias & safety testing", desc: "Toxicity, fairness, privacy leakage, harmful outputs.", resources: [
-            { name: "Guardrails AI", url: "https://www.guardrailsai.com/" },
-            { name: "NVIDIA NeMo Guardrails", url: "https://github.com/NVIDIA/NeMo-Guardrails" }
+          { id: "p2-5", title: "Red-Teaming & Safety Testing", desc: "Adversarial prompts, jailbreaks, toxicity, bias detection.", hours: 7, resources: [
+            { name: "Promptfoo Red Team Guide", url: "https://www.promptfoo.dev/docs/red-team/" },
+            { name: "Guardrails AI", url: "https://www.guardrailsai.com/" }
           ], status: "notstarted" },
-          { id: "p2-6", title: "Cost & performance testing", desc: "Token usage, latency, throughput, rate limits.", resources: [
-            { name: "OpenAI API Pricing", url: "https://openai.com/pricing" },
-            { name: "LiteLLM (cost tracking)", url: "https://github.com/BerriAI/litellm" }
+          { id: "p2-6", title: "LangSmith: Tracing & Debugging", desc: "Trace LLM calls, debug chains, evaluate outputs.", hours: 6, resources: [
+            { name: "LangSmith Docs", url: "https://docs.smith.langchain.com/" },
+            { name: "LangSmith Quickstart", url: "https://docs.smith.langchain.com/tutorials/Developers/quick_start" }
           ], status: "notstarted" },
-          { id: "p2-7", title: "Tool: Promptfoo", desc: "Versioned prompt testing and red-teaming.", resources: [
-            { name: "Promptfoo Docs", url: "https://www.promptfoo.dev/docs/intro" }
-          ], status: "notstarted" },
-          { id: "p2-8", title: "Tool: LangSmith", desc: "Tracing, evaluation, observability for LangChain apps.", resources: [
-            { name: "LangSmith Docs", url: "https://docs.smith.langchain.com/" }
-          ], status: "notstarted" },
-          { id: "p2-9", title: "Tool: TruLens / DeepEval / Ragas", desc: "Open-source LLM evaluation frameworks.", resources: [
-            { name: "TruLens GitHub", url: "https://github.com/truera/trulens" },
-            { name: "DeepEval GitHub", url: "https://github.com/confident-ai/deepeval" },
-            { name: "Ragas GitHub", url: "https://github.com/explodinggradients/ragas" }
-          ], status: "notstarted" },
-          { id: "p2-10", title: "Certification: AWS ML Specialty", desc: "AWS Certified Machine Learning - Specialty.", resources: [
-            { name: "AWS ML Certification", url: "https://aws.amazon.com/certification/certified-machine-learning-specialty/" }
-          ], status: "notstarted" },
-          { id: "p2-11", title: "Certification: Azure AI Engineer", desc: "Azure AI Engineer Associate (AI-102).", resources: [
-            { name: "Microsoft Learn AI-102", url: "https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-engineer/" }
+          { id: "p2-7", title: "Cost & Latency Testing", desc: "Token counting, cost estimation, latency benchmarks, rate limit handling.", hours: 4, resources: [
+            { name: "OpenAI Tokenizer", url: "https://platform.openai.com/tokenizer" },
+            { name: "LiteLLM (multi-provider)", url: "https://github.com/BerriAI/litellm" }
           ], status: "notstarted" }
         ]
       },
       {
-        phase: "Phase 3: Agent & Application Testing (Weeks 13-20)",
+        phase: "Phase 3: Agent Testing (Weeks 21-28)",
+        totalHours: 38,
         items: [
-          { id: "p3-1", title: "Agent behavior testing", desc: "Multi-step task completion, tool call correctness, loop prevention, recovery.", resources: [
+          { id: "p3-1", title: "LangChain Agents Basics", desc: "Understand agents, tools, ReAct pattern, function calling.", hours: 8, resources: [
             { name: "LangChain Agents Docs", url: "https://python.langchain.com/docs/modules/agents/" },
-            { name: "AutoGen Documentation", url: "https://microsoft.github.io/autogen/" }
-          ], status: "notstarted" },
-          { id: "p3-2", title: "State and memory testing", desc: "Conversation continuity, context limits, memory retrieval accuracy.", resources: [
-            { name: "LangChain Memory", url: "https://python.langchain.com/docs/modules/memory/" }
-          ], status: "notstarted" },
-          { id: "p3-3", title: "Tool/API integration testing", desc: "Function calling, API reliability, fallback behavior.", resources: [
-            { name: "Postman Learning Center", url: "https://learning.postman.com/" },
             { name: "OpenAI Function Calling", url: "https://platform.openai.com/docs/guides/function-calling" }
           ], status: "notstarted" },
-          { id: "p3-4", title: "Orchestration testing", desc: "LangChain, LlamaIndex, AutoGen, CrewAI workflows.", resources: [
-            { name: "LangChain Docs", url: "https://python.langchain.com/docs/" },
-            { name: "LlamaIndex Docs", url: "https://docs.llamaindex.ai/" },
-            { name: "CrewAI Docs", url: "https://docs.crewai.com/" }
+          { id: "p3-2", title: "Agent Evaluation with LangSmith", desc: "Evaluate multi-step agent behavior, tool call accuracy, task completion.", hours: 8, resources: [
+            { name: "LangSmith Evaluation", url: "https://docs.smith.langchain.com/evaluation" },
+            { name: "LangSmith Agent Tracing", url: "https://docs.smith.langchain.com/tutorials/Developers/agents" }
           ], status: "notstarted" },
-          { id: "p3-5", title: "Human-in-the-loop evaluation", desc: "A/B testing, preference alignment, feedback loops.", resources: [
-            { name: "Weights & Biases", url: "https://wandb.ai/" }
-          ], status: "notstarted" },
-          { id: "p3-6", title: "End-to-end LLM app testing", desc: "Full flow: user input -> retrieval -> LLM -> response -> guardrails.", resources: [
-            { name: "Playwright Docs", url: "https://playwright.dev/" },
-            { name: "Pytest Documentation", url: "https://docs.pytest.org/" }
-          ], status: "notstarted" },
-          { id: "p3-7", title: "Tool: Hugging Face", desc: "Open models, datasets, evaluation.", resources: [
-            { name: "Hugging Face Hub", url: "https://huggingface.co/" },
-            { name: "HF Evaluate Library", url: "https://huggingface.co/docs/evaluate/" }
-          ], status: "notstarted" },
-          { id: "p3-8", title: "Certification: Google ML Engineer", desc: "Google Professional Machine Learning Engineer.", resources: [
-            { name: "Google Cloud ML Cert", url: "https://cloud.google.com/learn/certification/machine-learning-engineer" }
-          ], status: "notstarted" },
-          { id: "p3-9", title: "Certification: Hugging Face AI Agents", desc: "Free/cheap practical AI agents course.", resources: [
-            { name: "HF AI Agents Course", url: "https://huggingface.co/learn/agents-course/unit0/introduction" }
-          ], status: "notstarted" }
-        ]
-      },
-      {
-        phase: "Phase 4: MLOps, Quality Engineering & Automation (Weeks 21-28)",
-        items: [
-          { id: "p4-1", title: "MLOps / LLMOps", desc: "Model versioning, A/B testing, monitoring, drift detection.", resources: [
-            { name: "MLOps Specialization", url: "https://www.coursera.org/specializations/machine-learning-engineering-for-production-mlops" }
-          ], status: "notstarted" },
-          { id: "p4-2", title: "CI/CD for AI", desc: "Automated evaluation in pipelines, regression testing for prompts/models.", resources: [
-            { name: "GitHub Actions Docs", url: "https://docs.github.com/en/actions" },
-            { name: "Jenkins Documentation", url: "https://www.jenkins.io/doc/" }
-          ], status: "notstarted" },
-          { id: "p4-3", title: "Observability", desc: "Logging traces, metrics, evaluation dashboards.", resources: [
-            { name: "WhyLabs", url: "https://whylabs.ai/" },
-            { name: "Evidently AI", url: "https://www.evidentlyai.com/" }
-          ], status: "notstarted" },
-          { id: "p4-4", title: "Data quality for AI", desc: "Dataset validation, labeling quality, synthetic data testing.", resources: [
-            { name: "Great Expectations", url: "https://greatexpectations.io/" },
-            { name: "YData Profiling", url: "https://github.com/ydataai/ydata-profiling" }
-          ], status: "notstarted" },
-          { id: "p4-5", title: "Regulatory/compliance testing", desc: "GDPR, AI Act, model explainability, auditability.", resources: [
-            { name: "NIST AI RMF", url: "https://www.nist.gov/itl/ai-risk-management-framework" },
-            { name: "EU AI Act Summary", url: "https://artificialintelligenceact.eu/" }
-          ], status: "notstarted" },
-          { id: "p4-6", title: "Tool: MLflow", desc: "Model lifecycle and experiment tracking.", resources: [
-            { name: "MLflow Documentation", url: "https://mlflow.org/docs/latest/index.html" }
-          ], status: "notstarted" },
-          { id: "p4-7", title: "Tool: Evidently AI / WhyLabs", desc: "ML model monitoring and data drift.", resources: [
-            { name: "Evidently AI Docs", url: "https://docs.evidentlyai.com/" },
-            { name: "WhyLabs Docs", url: "https://docs.whylabs.ai/" }
-          ], status: "notstarted" },
-          { id: "p4-8", title: "Certification: ISTQB AI Testing", desc: "QA-specific AI/ML testing credential.", resources: [
-            { name: "ISTQB AI Testing", url: "https://www.istqb.org/certifications/artificial-intelligence-tester" }
-          ], status: "notstarted" },
-          { id: "p4-9", title: "Certification: MLOps Professional", desc: "Various providers (certified MLOps programs).", resources: [
-            { name: "DataCamp MLOps", url: "https://www.datacamp.com/tracks/mlops-fundamentals" },
-            { name: "Coursera MLOps", url: "https://www.coursera.org/specializations/machine-learning-engineering-for-production-mlops" }
-          ], status: "notstarted" }
-        ]
-      },
-      {
-        phase: "Phase 5: Portfolio Projects",
-        items: [
-          { id: "p5-1", title: "RAG chatbot tester", desc: "Evaluate retrieval + answer quality using Ragas/TruLens.", resources: [
-            { name: "Ragas Tutorial", url: "https://docs.ragas.io/en/stable/getstarted/index.html" },
-            { name: "TruLens Quickstart", url: "https://www.trulens.org/trulens_eval/getting_started/" }
-          ], status: "notstarted" },
-          { id: "p5-2", title: "Prompt regression suite", desc: "Version prompts and test outputs across versions.", resources: [
-            { name: "Promptfoo Getting Started", url: "https://www.promptfoo.dev/docs/getting-started" }
-          ], status: "notstarted" },
-          { id: "p5-3", title: "LLM API automation framework", desc: "Test OpenAI/Anthropic endpoints for latency, cost, correctness.", resources: [
+          { id: "p3-3", title: "Build: Agent Test Harness", desc: "Create a test framework for a simple agent — verify tool calls, outputs, edge cases.", hours: 10, resources: [
             { name: "Pytest Documentation", url: "https://docs.pytest.org/" },
-            { name: "Requests Library", url: "https://requests.readthedocs.io/" }
+            { name: "LangChain Testing Guide", url: "https://python.langchain.com/docs/guides/evaluation/" }
           ], status: "notstarted" },
-          { id: "p5-4", title: "Agent evaluation harness", desc: "Test a simple LangChain agent on multi-step tasks.", resources: [
-            { name: "LangChain Evaluation", url: "https://python.langchain.com/docs/guides/evaluation/" },
-            { name: "LangSmith Testing", url: "https://docs.smith.langchain.com/evaluation" }
+          { id: "p3-4", title: "Memory & State Testing", desc: "Test conversation continuity, context window limits, memory retrieval.", hours: 6, resources: [
+            { name: "LangChain Memory", url: "https://python.langchain.com/docs/modules/memory/" }
           ], status: "notstarted" },
-          { id: "p5-5", title: "Red-team report", desc: "Document jailbreak attempts, bias, and hallucination findings.", resources: [
-            { name: "Promptfoo Red Teaming", url: "https://www.promptfoo.dev/docs/red-team/" }
+          { id: "p3-5", title: "Multi-Agent Systems Overview", desc: "Understand AutoGen, CrewAI — how to test agent collaboration.", hours: 6, resources: [
+            { name: "AutoGen Docs", url: "https://microsoft.github.io/autogen/" },
+            { name: "CrewAI Docs", url: "https://docs.crewai.com/" }
+          ], status: "notstarted" }
+        ]
+      },
+      {
+        phase: "Phase 4: CI/CD & Portfolio (Weeks 29-34)",
+        totalHours: 28,
+        items: [
+          { id: "p4-1", title: "CI/CD for LLM Apps", desc: "Integrate Promptfoo or LangSmith evals into GitHub Actions.", hours: 8, resources: [
+            { name: "GitHub Actions Docs", url: "https://docs.github.com/en/actions" },
+            { name: "Promptfoo CI Integration", url: "https://www.promptfoo.dev/docs/integrations/ci-cd/" }
           ], status: "notstarted" },
-          { id: "p5-6", title: "CI/CD for LLM app", desc: "Integrate automated evals into a GitHub Actions pipeline.", resources: [
-            { name: "GitHub Actions", url: "https://docs.github.com/en/actions" }
+          { id: "p4-2", title: "Portfolio Project: RAG Tester", desc: "Document your RAG evaluation project on GitHub with README, results.", hours: 6, resources: [
+            { name: "GitHub README Guide", url: "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes" }
+          ], status: "notstarted" },
+          { id: "p4-3", title: "Portfolio Project: Red-Team Report", desc: "Publish a red-team analysis of a public model or your own app.", hours: 6, resources: [
+            { name: "Promptfoo Red Team Examples", url: "https://www.promptfoo.dev/docs/red-team/quickstart/" }
+          ], status: "notstarted" },
+          { id: "p4-4", title: "Certification: ISTQB AI Testing", desc: "QA-specific AI/ML testing credential — study and schedule exam.", hours: 8, resources: [
+            { name: "ISTQB AI Testing Syllabus", url: "https://www.istqb.org/certifications/artificial-intelligence-tester" }
+          ], status: "notstarted" }
+        ]
+      },
+      {
+        phase: "Bonus: Deep Dives (Optional)",
+        totalHours: 20,
+        items: [
+          { id: "p5-1", title: "Hugging Face AI Agents Course", desc: "Free course on building and understanding AI agents.", hours: 8, resources: [
+            { name: "HF AI Agents Course", url: "https://huggingface.co/learn/agents-course/unit0/introduction" }
+          ], status: "notstarted" },
+          { id: "p5-2", title: "MLflow for Experiment Tracking", desc: "Track model experiments, compare runs, version artifacts.", hours: 6, resources: [
+            { name: "MLflow Quickstart", url: "https://mlflow.org/docs/latest/getting-started/index.html" }
+          ], status: "notstarted" },
+          { id: "p5-3", title: "Evidently AI: Model Monitoring", desc: "Monitor data drift, model performance in production.", hours: 6, resources: [
+            { name: "Evidently AI Docs", url: "https://docs.evidentlyai.com/" }
           ], status: "notstarted" }
         ]
       }
     ];
 
-    const STORAGE_KEY = "ai_qa_roadmap_state";
+    const STORAGE_KEY = "ai_qa_roadmap_state_v2";
     let currentFilter = "all";
     let searchTerm = "";
 
@@ -455,16 +427,19 @@
     function updateSummary() {
       const counts = { completed: 0, inprogress: 0, notstarted: 0 };
       let total = 0;
+      let hoursCompleted = 0;
       roadmap.forEach(phase => {
         phase.items.forEach(item => {
           counts[item.status]++;
           total++;
+          if (item.status === "completed") hoursCompleted += item.hours;
         });
       });
       document.getElementById("count-completed").textContent = counts.completed;
       document.getElementById("count-inprogress").textContent = counts.inprogress;
       document.getElementById("count-notstarted").textContent = counts.notstarted;
       document.getElementById("count-total").textContent = total;
+      document.getElementById("hours-completed").textContent = hoursCompleted;
     }
 
     function setStatus(id, status) {
@@ -503,6 +478,7 @@
         header.className = "phase-header";
         header.innerHTML = `
           <h2>${phase.phase}</h2>
+          <span class="hours-badge">~${phase.totalHours} hrs</span>
           <span class="meta">${completedCount}/${phase.items.length} completed</span>
         `;
         phaseEl.appendChild(header);
@@ -533,7 +509,7 @@
           content.className = "content";
           const resources = item.resources.map(r => `<a class="resource-tag" href="${r.url}" target="_blank" rel="noopener">${r.name}</a>`).join("");
           content.innerHTML = `
-            <h3>${item.title}</h3>
+            <h3>${item.title} <span class="time-est">${item.hours} hrs</span></h3>
             <p>${item.desc}</p>
             <div class="resources">${resources}</div>
           `;

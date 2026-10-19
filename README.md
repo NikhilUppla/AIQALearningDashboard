@@ -10,13 +10,29 @@ A personal learning tracker for transitioning from QA Automation Engineer to AI/
 
 ## What This Is
 
-A single-page dashboard that tracks your progress through a structured roadmap for learning AI/LLM testing skills. Built for QA engineers who want to specialize in testing AI systems, LLM applications, RAG pipelines, and AI agents.
+A single-page dashboard that tracks your progress through a **realistic, part-time roadmap** for learning AI/LLM testing skills. Designed for working QA engineers studying 6-10 hours per week.
+
+---
+
+## Realistic Timeline
+
+| Phase | Weeks | Hours | Focus |
+|-------|-------|-------|-------|
+| **Phase 1: Foundations** | 1-10 | ~45 hrs | ML concepts, LLMs, RAG, prompt engineering |
+| **Phase 2: LLM Testing** | 11-20 | ~45 hrs | Evaluation, Promptfoo, hallucination, red-teaming |
+| **Phase 3: Agent Testing** | 21-28 | ~38 hrs | LangChain agents, LangSmith, test harness |
+| **Phase 4: CI/CD & Portfolio** | 29-34 | ~28 hrs | GitHub Actions, portfolio projects, certification |
+| **Bonus: Deep Dives** | Optional | ~20 hrs | HuggingFace, MLflow, Evidently AI |
+
+**Total: ~156 hours over 5-6 months at 6-10 hrs/week**
 
 ---
 
 ## Features
 
 - **Progress Tracking** — Mark items as Not Started, In Progress, or Completed
+- **Time Estimates** — Each topic shows estimated hours
+- **Hours Counter** — Track total hours completed
 - **Auto-Save** — Progress saves automatically to browser localStorage
 - **Filtering** — Filter by status or search by keyword
 - **Clickable Resources** — Every topic links directly to courses, docs, and tools
@@ -25,36 +41,37 @@ A single-page dashboard that tracks your progress through a structured roadmap f
 
 ---
 
-## Roadmap Phases
-
-| Phase | Duration | Focus |
-|-------|----------|-------|
-| **Phase 1: Foundations** | Weeks 1–6 | ML basics, LLM fundamentals, RAG overview |
-| **Phase 2: LLM Testing** | Weeks 7–12 | Evaluation metrics, hallucination detection, prompt testing, bias/safety |
-| **Phase 3: Agent Testing** | Weeks 13–20 | Multi-step agents, memory testing, orchestration frameworks |
-| **Phase 4: MLOps & Automation** | Weeks 21–28 | CI/CD for AI, observability, compliance testing |
-| **Phase 5: Portfolio Projects** | Ongoing | Hands-on projects to demonstrate skills |
-
----
-
 ## Tools Covered
 
 - **Evaluation:** Ragas, TruLens, DeepEval, Promptfoo
-- **Observability:** LangSmith, Weights & Biases, MLflow
+- **Observability:** LangSmith, MLflow
 - **Frameworks:** LangChain, LlamaIndex, AutoGen, CrewAI
-- **Safety:** Guardrails AI, NeMo Guardrails
-- **Monitoring:** Evidently AI, WhyLabs
+- **Safety:** Guardrails AI, Promptfoo Red Team
+- **APIs:** OpenAI, Anthropic
 
 ---
 
-## Certifications Included
+## Key Resources
 
-- DeepLearning.AI Machine Learning Specialization
-- AWS Certified Machine Learning – Specialty
-- Azure AI Engineer Associate (AI-102)
-- Google Professional Machine Learning Engineer
-- ISTQB AI Testing
-- Hugging Face AI Agents Course
+### Phase 1: Foundations
+- [Google ML Crash Course](https://developers.google.com/machine-learning/crash-course) — ML basics without coding
+- [Andrej Karpathy: Intro to LLMs](https://www.youtube.com/watch?v=zjkBMFhNj_g) — 1 hour overview
+- [DeepLearning.AI Prompt Engineering](https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/) — Free, 1.5 hours
+- [LlamaIndex RAG Tutorial](https://docs.llamaindex.ai/en/stable/getting_started/starter_example/)
+
+### Phase 2: LLM Testing
+- [Promptfoo](https://www.promptfoo.dev/) — Prompt testing and red-teaming
+- [Ragas](https://docs.ragas.io/) — RAG evaluation metrics
+- [LangSmith](https://docs.smith.langchain.com/) — Tracing and debugging
+- [TruLens](https://www.trulens.org/) — Hallucination detection
+
+### Phase 3: Agent Testing
+- [LangChain Agents](https://python.langchain.com/docs/modules/agents/)
+- [LangSmith Evaluation](https://docs.smith.langchain.com/evaluation)
+- [AutoGen](https://microsoft.github.io/autogen/)
+
+### Certification
+- [ISTQB AI Testing](https://www.istqb.org/certifications/artificial-intelligence-tester) — QA-specific credential
 
 ---
 
@@ -86,21 +103,12 @@ Deploy to any static hosting:
 
 ---
 
-## Customization
-
-Edit `index.html` to:
-- Add/remove topics in the `roadmap` array
-- Change phase durations
-- Add new resources with `{ name: "...", url: "..." }`
-- Modify styling in the `<style>` block
-
----
-
 ## Who This Is For
 
 - QA Automation Engineers transitioning to AI testing
 - Software testers learning LLM evaluation
 - Anyone building a career in AI quality assurance
+- People with 6-10 hours/week to study
 
 ---
 
