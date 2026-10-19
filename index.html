@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI QA Learning Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #4f46e5;
+      --accent-light: #e0e7ff;
+      --completed: #10b981;
+      --inprogress: #f59e0b;
+      --notstarted: #9ca3af;
+      --border: #e5e7eb;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    header {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    header h1 { margin: 0; font-size: 1.75rem; }
+    header p { margin: 0.5rem 0 0; opacity: 0.9; }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .summary-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+      text-align: center;
+      border-top: 4px solid transparent;
+    }
+    .summary-card.completed { border-top-color: var(--completed); }
+    .summary-card.inprogress { border-top-color: var(--inprogress); }
+    .summary-card.notstarted { border-top-color: var(--notstarted); }
+    .summary-card.total { border-top-color: var(--accent); }
+    .summary-card .number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .summary-card .label {
+      font-size: 0.875rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .filter-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    button {
+      border: none;
+      background: var(--card);
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      box-shadow: var(--shadow);
+      transition: all 0.15s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    button.active { background: var(--accent); color: white; }
+    button.export { background: var(--accent-light); color: var(--accent); }
+    button.reset { background: #fee2e2; color: #b91c1c; }
+
+    .search-box {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      min-width: 220px;
+    }
+
+    .phase {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+    .phase-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      cursor: pointer;
+    }
+    .phase-header h2 { margin: 0; font-size: 1.25rem; }
+    .phase-header .meta { font-size: 0.85rem; color: var(--muted); }
+
+    .items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      transition: background 0.15s ease;
+    }
+    .item:hover { background: #fafafa; }
+    .item.hidden { display: none; }
+
+    .status {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      min-width: 120px;
+    }
+    .status-btn {
+      padding: 0.35rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      border: 1px solid var(--border);
+      background: white;
+    }
+    .status-btn.completed { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+    .status-btn.inprogress { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+    .status-btn.notstarted { background: #f3f4f6; color: #4b5563; border-color: #e5e7eb; }
+    .status-btn.active { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+    .content { flex: 1; }
+    .content h3 { margin: 0 0 0.35rem; font-size: 1rem; }
+    .content p { margin: 0 0 0.5rem; color: var(--muted); font-size: 0.9rem; }
+    .resources {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .resource-tag {
+      background: var(--accent-light);
+      color: var(--accent);
+      padding: 0.2rem 0.5rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .resource-tag:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.75rem;
+    }
+    .progress-bar .fill {
+      height: 100%;
+      background: var(--completed);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 600px) {
+      .item { flex-direction: column; }
+      .status { flex-direction: row; width: 100%; }
+      .status-btn { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AI QA / LLM Testing Learning Roadmap</h1>
+    <p>From QA automation fundamentals to AI agents, MLOps, and certifications</p>
+  </header>
+
+  <div class="container">
+    <div class="summary" id="summary">
+      <div class="summary-card completed"><div class="number" id="count-completed">0</div><div class="label">Completed</div></div>
+      <div class="summary-card inprogress"><div class="number" id="count-inprogress">0</div><div class="label">In Progress</div></div>
+      <div class="summary-card notstarted"><div class="number" id="count-notstarted">0</div><div class="label">Not Started</div></div>
+      <div class="summary-card total"><div class="number" id="count-total">0</div><div class="label">Total</div></div>
+    </div>
+
+    <div class="controls">
+      <div class="filter-group">
+        <button class="filter active" data-filter="all">All</button>
+        <button class="filter" data-filter="notstarted">Not Started</button>
+        <button class="filter" data-filter="inprogress">In Progress</button>
+        <button class="filter" data-filter="completed">Completed</button>
+      </div>
+      <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+        <input type="text" class="search-box" id="search" placeholder="Search topics, tools, certs..." />
+        <button class="export" id="exportBtn">Export JSON</button>
+        <button class="reset" id="resetBtn">Reset</button>
+      </div>
+    </div>
+
+    <div id="phases"></div>
+  </div>
+
+  <footer>
+    Progress is saved automatically in your browser. Deploy free on GitHub Pages, Netlify, or Vercel.
+  </footer>
+
+  <script>
+    const roadmap = [
+      {
+        phase: "Phase 1: Foundations (Weeks 1-6)",
+        items: [
+          { id: "p1-1", title: "Machine Learning fundamentals", desc: "Supervised/unsupervised learning, training vs inference, overfitting, model lifecycle.", resources: [
+            { name: "Fast.ai Practical Deep Learning", url: "https://course.fast.ai/" },
+            { name: "Coursera ML Specialization", url: "https://www.coursera.org/specializations/machine-learning-introduction" }
+          ], status: "notstarted" },
+          { id: "p1-2", title: "Deep learning & NLP basics", desc: "Embeddings, transformers, tokenization, attention mechanism.", resources: [
+            { name: "DeepLearning.AI NLP Specialization", url: "https://www.coursera.org/specializations/natural-language-processing" },
+            { name: "Stanford CS224N (YouTube)", url: "https://www.youtube.com/playlist?list=PLoROMvodv4rOSH4v6133s9LFPRHjEmbmJ" }
+          ], status: "notstarted" },
+          { id: "p1-3", title: "LLM fundamentals", desc: "Pre-training, fine-tuning, RLHF, prompt engineering, context windows.", resources: [
+            { name: "Prompt Engineering for Developers", url: "https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/" },
+            { name: "OpenAI Documentation", url: "https://platform.openai.com/docs" },
+            { name: "Anthropic Documentation", url: "https://docs.anthropic.com/" }
+          ], status: "notstarted" },
+          { id: "p1-4", title: "RAG systems overview", desc: "Retrieval, chunking, vector DBs, relevance, grounding.", resources: [
+            { name: "Pinecone Learning Center", url: "https://www.pinecone.io/learn/" },
+            { name: "Weaviate Documentation", url: "https://weaviate.io/developers/weaviate" },
+            { name: "LlamaIndex Tutorials", url: "https://docs.llamaindex.ai/en/stable/" }
+          ], status: "notstarted" },
+          { id: "p1-5", title: "Certification: ML Specialization", desc: "Coursera DeepLearning.AI Machine Learning Specialization.", resources: [
+            { name: "Coursera ML Specialization", url: "https://www.coursera.org/specializations/machine-learning-introduction" }
+          ], status: "notstarted" }
+        ]
+      },
+      {
+        phase: "Phase 2: LLM Testing Fundamentals (Weeks 7-12)",
+        items: [
+          { id: "p2-1", title: "LLM evaluation metrics", desc: "Perplexity, BLEU, ROUGE, BERTScore, faithfulness, relevance, answer correctness.", resources: [
+            { name: "Ragas Documentation", url: "https://docs.ragas.io/" },
+            { name: "DeepEval Documentation", url: "https://docs.confident-ai.com/" }
+          ], status: "notstarted" },
+          { id: "p2-2", title: "Hallucination detection", desc: "Groundedness, factual consistency, citation verification.", resources: [
+            { name: "TruLens Documentation", url: "https://www.trulens.org/trulens_eval/getting_started/" },
+            { name: "LangSmith Documentation", url: "https://docs.smith.langchain.com/" }
+          ], status: "notstarted" },
+          { id: "p2-3", title: "Prompt testing", desc: "Variation testing, adversarial prompts, jailbreak/red-team testing.", resources: [
+            { name: "Promptfoo", url: "https://www.promptfoo.dev/" },
+            { name: "OpenAI Evals GitHub", url: "https://github.com/openai/evals" }
+          ], status: "notstarted" },
+          { id: "p2-4", title: "RAG evaluation", desc: "Retrieval accuracy, context relevance, answer groundedness, latency.", resources: [
+            { name: "Ragas RAG Evaluation", url: "https://docs.ragas.io/en/stable/concepts/metrics/index.html" },
+            { name: "TruLens RAG Triad", url: "https://www.trulens.org/" }
+          ], status: "notstarted" },
+          { id: "p2-5", title: "Bias & safety testing", desc: "Toxicity, fairness, privacy leakage, harmful outputs.", resources: [
+            { name: "Guardrails AI", url: "https://www.guardrailsai.com/" },
+            { name: "NVIDIA NeMo Guardrails", url: "https://github.com/NVIDIA/NeMo-Guardrails" }
+          ], status: "notstarted" },
+          { id: "p2-6", title: "Cost & performance testing", desc: "Token usage, latency, throughput, rate limits.", resources: [
+            { name: "OpenAI API Pricing", url: "https://openai.com/pricing" },
+            { name: "LiteLLM (cost tracking)", url: "https://github.com/BerriAI/litellm" }
+          ], status: "notstarted" },
+          { id: "p2-7", title: "Tool: Promptfoo", desc: "Versioned prompt testing and red-teaming.", resources: [
+            { name: "Promptfoo Docs", url: "https://www.promptfoo.dev/docs/intro" }
+          ], status: "notstarted" },
+          { id: "p2-8", title: "Tool: LangSmith", desc: "Tracing, evaluation, observability for LangChain apps.", resources: [
+            { name: "LangSmith Docs", url: "https://docs.smith.langchain.com/" }
+          ], status: "notstarted" },
+          { id: "p2-9", title: "Tool: TruLens / DeepEval / Ragas", desc: "Open-source LLM evaluation frameworks.", resources: [
+            { name: "TruLens GitHub", url: "https://github.com/truera/trulens" },
+            { name: "DeepEval GitHub", url: "https://github.com/confident-ai/deepeval" },
+            { name: "Ragas GitHub", url: "https://github.com/explodinggradients/ragas" }
+          ], status: "notstarted" },
+          { id: "p2-10", title: "Certification: AWS ML Specialty", desc: "AWS Certified Machine Learning - Specialty.", resources: [
+            { name: "AWS ML Certification", url: "https://aws.amazon.com/certification/certified-machine-learning-specialty/" }
+          ], status: "notstarted" },
+          { id: "p2-11", title: "Certification: Azure AI Engineer", desc: "Azure AI Engineer Associate (AI-102).", resources: [
+            { name: "Microsoft Learn AI-102", url: "https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-engineer/" }
+          ], status: "notstarted" }
+        ]
+      },
+      {
+        phase: "Phase 3: Agent & Application Testing (Weeks 13-20)",
+        items: [
+          { id: "p3-1", title: "Agent behavior testing", desc: "Multi-step task completion, tool call correctness, loop prevention, recovery.", resources: [
+            { name: "LangChain Agents Docs", url: "https://python.langchain.com/docs/modules/agents/" },
+            { name: "AutoGen Documentation", url: "https://microsoft.github.io/autogen/" }
+          ], status: "notstarted" },
+          { id: "p3-2", title: "State and memory testing", desc: "Conversation continuity, context limits, memory retrieval accuracy.", resources: [
+            { name: "LangChain Memory", url: "https://python.langchain.com/docs/modules/memory/" }
+          ], status: "notstarted" },
+          { id: "p3-3", title: "Tool/API integration testing", desc: "Function calling, API reliability, fallback behavior.", resources: [
+            { name: "Postman Learning Center", url: "https://learning.postman.com/" },
+            { name: "OpenAI Function Calling", url: "https://platform.openai.com/docs/guides/function-calling" }
+          ], status: "notstarted" },
+          { id: "p3-4", title: "Orchestration testing", desc: "LangChain, LlamaIndex, AutoGen, CrewAI workflows.", resources: [
+            { name: "LangChain Docs", url: "https://python.langchain.com/docs/" },
+            { name: "LlamaIndex Docs", url: "https://docs.llamaindex.ai/" },
+            { name: "CrewAI Docs", url: "https://docs.crewai.com/" }
+          ], status: "notstarted" },
+          { id: "p3-5", title: "Human-in-the-loop evaluation", desc: "A/B testing, preference alignment, feedback loops.", resources: [
+            { name: "Weights & Biases", url: "https://wandb.ai/" }
+          ], status: "notstarted" },
+          { id: "p3-6", title: "End-to-end LLM app testing", desc: "Full flow: user input -> retrieval -> LLM -> response -> guardrails.", resources: [
+            { name: "Playwright Docs", url: "https://playwright.dev/" },
+            { name: "Pytest Documentation", url: "https://docs.pytest.org/" }
+          ], status: "notstarted" },
+          { id: "p3-7", title: "Tool: Hugging Face", desc: "Open models, datasets, evaluation.", resources: [
+            { name: "Hugging Face Hub", url: "https://huggingface.co/" },
+            { name: "HF Evaluate Library", url: "https://huggingface.co/docs/evaluate/" }
+          ], status: "notstarted" },
+          { id: "p3-8", title: "Certification: Google ML Engineer", desc: "Google Professional Machine Learning Engineer.", resources: [
+            { name: "Google Cloud ML Cert", url: "https://cloud.google.com/learn/certification/machine-learning-engineer" }
+          ], status: "notstarted" },
+          { id: "p3-9", title: "Certification: Hugging Face AI Agents", desc: "Free/cheap practical AI agents course.", resources: [
+            { name: "HF AI Agents Course", url: "https://huggingface.co/learn/agents-course/unit0/introduction" }
+          ], status: "notstarted" }
+        ]
+      },
+      {
+        phase: "Phase 4: MLOps, Quality Engineering & Automation (Weeks 21-28)",
+        items: [
+          { id: "p4-1", title: "MLOps / LLMOps", desc: "Model versioning, A/B testing, monitoring, drift detection.", resources: [
+            { name: "MLOps Specialization", url: "https://www.coursera.org/specializations/machine-learning-engineering-for-production-mlops" }
+          ], status: "notstarted" },
+          { id: "p4-2", title: "CI/CD for AI", desc: "Automated evaluation in pipelines, regression testing for prompts/models.", resources: [
+            { name: "GitHub Actions Docs", url: "https://docs.github.com/en/actions" },
+            { name: "Jenkins Documentation", url: "https://www.jenkins.io/doc/" }
+          ], status: "notstarted" },
+          { id: "p4-3", title: "Observability", desc: "Logging traces, metrics, evaluation dashboards.", resources: [
+            { name: "WhyLabs", url: "https://whylabs.ai/" },
+            { name: "Evidently AI", url: "https://www.evidentlyai.com/" }
+          ], status: "notstarted" },
+          { id: "p4-4", title: "Data quality for AI", desc: "Dataset validation, labeling quality, synthetic data testing.", resources: [
+            { name: "Great Expectations", url: "https://greatexpectations.io/" },
+            { name: "YData Profiling", url: "https://github.com/ydataai/ydata-profiling" }
+          ], status: "notstarted" },
+          { id: "p4-5", title: "Regulatory/compliance testing", desc: "GDPR, AI Act, model explainability, auditability.", resources: [
+            { name: "NIST AI RMF", url: "https://www.nist.gov/itl/ai-risk-management-framework" },
+            { name: "EU AI Act Summary", url: "https://artificialintelligenceact.eu/" }
+          ], status: "notstarted" },
+          { id: "p4-6", title: "Tool: MLflow", desc: "Model lifecycle and experiment tracking.", resources: [
+            { name: "MLflow Documentation", url: "https://mlflow.org/docs/latest/index.html" }
+          ], status: "notstarted" },
+          { id: "p4-7", title: "Tool: Evidently AI / WhyLabs", desc: "ML model monitoring and data drift.", resources: [
+            { name: "Evidently AI Docs", url: "https://docs.evidentlyai.com/" },
+            { name: "WhyLabs Docs", url: "https://docs.whylabs.ai/" }
+          ], status: "notstarted" },
+          { id: "p4-8", title: "Certification: ISTQB AI Testing", desc: "QA-specific AI/ML testing credential.", resources: [
+            { name: "ISTQB AI Testing", url: "https://www.istqb.org/certifications/artificial-intelligence-tester" }
+          ], status: "notstarted" },
+          { id: "p4-9", title: "Certification: MLOps Professional", desc: "Various providers (certified MLOps programs).", resources: [
+            { name: "DataCamp MLOps", url: "https://www.datacamp.com/tracks/mlops-fundamentals" },
+            { name: "Coursera MLOps", url: "https://www.coursera.org/specializations/machine-learning-engineering-for-production-mlops" }
+          ], status: "notstarted" }
+        ]
+      },
+      {
+        phase: "Phase 5: Portfolio Projects",
+        items: [
+          { id: "p5-1", title: "RAG chatbot tester", desc: "Evaluate retrieval + answer quality using Ragas/TruLens.", resources: [
+            { name: "Ragas Tutorial", url: "https://docs.ragas.io/en/stable/getstarted/index.html" },
+            { name: "TruLens Quickstart", url: "https://www.trulens.org/trulens_eval/getting_started/" }
+          ], status: "notstarted" },
+          { id: "p5-2", title: "Prompt regression suite", desc: "Version prompts and test outputs across versions.", resources: [
+            { name: "Promptfoo Getting Started", url: "https://www.promptfoo.dev/docs/getting-started" }
+          ], status: "notstarted" },
+          { id: "p5-3", title: "LLM API automation framework", desc: "Test OpenAI/Anthropic endpoints for latency, cost, correctness.", resources: [
+            { name: "Pytest Documentation", url: "https://docs.pytest.org/" },
+            { name: "Requests Library", url: "https://requests.readthedocs.io/" }
+          ], status: "notstarted" },
+          { id: "p5-4", title: "Agent evaluation harness", desc: "Test a simple LangChain agent on multi-step tasks.", resources: [
+            { name: "LangChain Evaluation", url: "https://python.langchain.com/docs/guides/evaluation/" },
+            { name: "LangSmith Testing", url: "https://docs.smith.langchain.com/evaluation" }
+          ], status: "notstarted" },
+          { id: "p5-5", title: "Red-team report", desc: "Document jailbreak attempts, bias, and hallucination findings.", resources: [
+            { name: "Promptfoo Red Teaming", url: "https://www.promptfoo.dev/docs/red-team/" }
+          ], status: "notstarted" },
+          { id: "p5-6", title: "CI/CD for LLM app", desc: "Integrate automated evals into a GitHub Actions pipeline.", resources: [
+            { name: "GitHub Actions", url: "https://docs.github.com/en/actions" }
+          ], status: "notstarted" }
+        ]
+      }
+    ];
+
+    const STORAGE_KEY = "ai_qa_roadmap_state";
+    let currentFilter = "all";
+    let searchTerm = "";
+
+    function loadState() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        roadmap.forEach(phase => {
+          phase.items.forEach(item => {
+            if (parsed[item.id]) item.status = parsed[item.id];
+          });
+        });
+      }
+    }
+
+    function saveState() {
+      const state = {};
+      roadmap.forEach(phase => {
+        phase.items.forEach(item => state[item.id] = item.status);
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function updateSummary() {
+      const counts = { completed: 0, inprogress: 0, notstarted: 0 };
+      let total = 0;
+      roadmap.forEach(phase => {
+        phase.items.forEach(item => {
+          counts[item.status]++;
+          total++;
+        });
+      });
+      document.getElementById("count-completed").textContent = counts.completed;
+      document.getElementById("count-inprogress").textContent = counts.inprogress;
+      document.getElementById("count-notstarted").textContent = counts.notstarted;
+      document.getElementById("count-total").textContent = total;
+    }
+
+    function setStatus(id, status) {
+      roadmap.forEach(phase => {
+        const item = phase.items.find(i => i.id === id);
+        if (item) item.status = status;
+      });
+      saveState();
+      render();
+    }
+
+    function matchesFilter(item) {
+      const matchesStatus = currentFilter === "all" || item.status === currentFilter;
+      const matchesSearch = !searchTerm ||
+        item.title.toLowerCase().includes(searchTerm) ||
+        item.desc.toLowerCase().includes(searchTerm) ||
+        item.resources.some(r => r.name.toLowerCase().includes(searchTerm));
+      return matchesStatus && matchesSearch;
+    }
+
+    function render() {
+      const container = document.getElementById("phases");
+      container.innerHTML = "";
+
+      roadmap.forEach((phase, phaseIndex) => {
+        const visibleItems = phase.items.filter(matchesFilter);
+        if (visibleItems.length === 0) return;
+
+        const phaseEl = document.createElement("div");
+        phaseEl.className = "phase";
+
+        const completedCount = phase.items.filter(i => i.status === "completed").length;
+        const progressPct = (completedCount / phase.items.length) * 100;
+
+        const header = document.createElement("div");
+        header.className = "phase-header";
+        header.innerHTML = `
+          <h2>${phase.phase}</h2>
+          <span class="meta">${completedCount}/${phase.items.length} completed</span>
+        `;
+        phaseEl.appendChild(header);
+
+        const bar = document.createElement("div");
+        bar.className = "progress-bar";
+        bar.innerHTML = `<div class="fill" style="width:${progressPct}%"></div>`;
+        phaseEl.appendChild(bar);
+
+        const itemsEl = document.createElement("div");
+        itemsEl.className = "items";
+
+        phase.items.forEach(item => {
+          const itemEl = document.createElement("div");
+          itemEl.className = "item" + (matchesFilter(item) ? "" : " hidden");
+
+          const statusDiv = document.createElement("div");
+          statusDiv.className = "status";
+          ["notstarted", "inprogress", "completed"].forEach(s => {
+            const btn = document.createElement("button");
+            btn.className = `status-btn ${s} ${item.status === s ? "active" : ""}`;
+            btn.textContent = s === "notstarted" ? "Not Started" : s === "inprogress" ? "In Progress" : "Completed";
+            btn.onclick = () => setStatus(item.id, s);
+            statusDiv.appendChild(btn);
+          });
+
+          const content = document.createElement("div");
+          content.className = "content";
+          const resources = item.resources.map(r => `<a class="resource-tag" href="${r.url}" target="_blank" rel="noopener">${r.name}</a>`).join("");
+          content.innerHTML = `
+            <h3>${item.title}</h3>
+            <p>${item.desc}</p>
+            <div class="resources">${resources}</div>
+          `;
+
+          itemEl.appendChild(statusDiv);
+          itemEl.appendChild(content);
+          itemsEl.appendChild(itemEl);
+        });
+
+        phaseEl.appendChild(itemsEl);
+        container.appendChild(phaseEl);
+      });
+
+      updateSummary();
+    }
+
+    document.querySelectorAll(".filter").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.dataset.filter;
+        render();
+      });
+    });
+
+    document.getElementById("search").addEventListener("input", e => {
+      searchTerm = e.target.value.toLowerCase().trim();
+      render();
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      if (confirm("Reset all progress? This cannot be undone.")) {
+        localStorage.removeItem(STORAGE_KEY);
+        roadmap.forEach(phase => phase.items.forEach(i => i.status = "notstarted"));
+        render();
+      }
+    });
+
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const state = {};
+      roadmap.forEach(phase => {
+        phase.items.forEach(item => state[item.id] = item.status);
+      });
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ai-qa-roadmap-progress.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    loadState();
+    render();
+  </script>
+</body>
+</html>
